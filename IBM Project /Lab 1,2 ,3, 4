@@ -1,0 +1,369 @@
+# This is the combination of lab 1, 2 and 3 completed by Mahbubur Rahman Opu.
+# It includes different data-related problem solvings using python.
+# data is cleaned, organized and wrenkled here.
+# Different statistical analysis and graphical representation 
+# Single and Multiple Linear regresssion 
+# Sloping(coefficient), correlation , descriptive and Intersect analysis
+# Use of Linegraph, histogram, Boxplot and scatter plot and so on .
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sb
+import scipy
+%matplotlib inline
+import urllib.request
+csv_url = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-DA0101EN-SkillsNetwork/labs/Data%20files/auto.csv"
+file_name, header= urllib.request.urlretrieve(csv_url)
+df=pd.read_csv(file_name)
+df.head()
+# create headers list
+headers = ["symboling","normalized-losses","make","fuel-type","aspiration", "num-of-doors","body-style",
+         "drive-wheels","engine-location","wheel-base", "length","width","height","curb-weight","engine-type",
+         "num-of-cylinders", "engine-size","fuel-system","bore","stroke","compression-ratio","horsepower",
+         "peak-rpm","city-mpg","highway-mpg","price"]
+print("headers\n", headers)
+df.columns =headers
+df.head()
+
+
+# Find missing values using isnull()
+missing_values = df.isnull()
+
+# Find columns with missing values and count them
+columns_with_missing = missing_values.any()  # Returns a boolean Series where True indicates columns with missing values
+missing_count_per_column = missing_values.sum()  # Returns a Series with the count of missing values per column
+
+# Display columns with missing values
+columns_with_missing = columns_with_missing[columns_with_missing]  # Filter out only the columns with missing values
+print("Columns with missing values:")
+print(columns_with_missing)
+
+# Display count of missing values per column
+print("\nCount of missing values per column:")
+print(missing_count_per_column)
+# Convert the "normalized-losses" column to numeric (float) data type
+df["normalized-losses"] = pd.to_numeric(df["normalized-losses"], errors="coerce")
+
+# Calculate the average of "normalized-losses" column
+avg_norm_loss = df["normalized-losses"].mean()
+
+print("Average of normalized-losses:", avg_norm_loss)
+df["normalized-losses"].replace(np.nan, avg_norm_loss, inplace=True)
+import pandas as pd
+
+# Assuming you have already loaded the CSV file into 'df' and replaced "?" with NaN
+df.replace("?", pd.NA, inplace=True)
+
+# Convert the "bore" column to numeric (float) data type
+df["bore"] = pd.to_numeric(df["bore"], errors="coerce")
+
+# Calculate the average of "bore" column
+avg_bore = df["bore"].mean()
+
+print("Average of bore:", avg_bore)
+df["bore"].replace(np.nan, avg_bore, inplace=True)
+import pandas as pd
+
+# Assuming you have already loaded the CSV file into 'df' and replaced "?" with NaN
+df.replace("?", pd.NA, inplace=True)
+
+# Convert the "stroke" column to numeric (float) data type
+df["stroke"] = pd.to_numeric(df["stroke"], errors="coerce")
+
+# Calculate the average of "stroke" column excluding NaN values
+avg_stroke = df["stroke"].mean(skipna=True)
+
+print("Average of stroke:", avg_stroke)
+
+
+# Fill missing values in "stroke" column with the average value
+df["stroke"].fillna(avg_stroke, inplace=True)
+
+# Display the DataFrame with missing values filled using the average value for "stroke" column
+print(df.head())
+df["stroke"].replace(np.nan, avg_stroke, inplace=True)
+
+# Convert the "horsepower" column to numeric (integer) data type
+df["horsepower"] = pd.to_numeric(df["horsepower"], errors="coerce")
+
+# Calculate the average of "horsepower" column excluding NaN values
+avg_horsepower = df["horsepower"].mean(skipna=True)
+
+# Fill missing values in "horsepower" column with the average value
+df["horsepower"].fillna(avg_horsepower, inplace=True)
+
+# Display the DataFrame with missing values filled using the average value for "horsepower" column
+print(df.head())
+
+df['horsepower'].replace(np.nan, avg_horsepower, inplace=True)
+# Convert the "peak-rpm" column to numeric (integer) data type
+df["peak-rpm"] = pd.to_numeric(df["peak-rpm"], errors="coerce")
+
+# Calculate the average of "peak-rpm" column excluding NaN values
+avg_peak_rpm = df["peak-rpm"].mean(skipna=True)
+
+# Fill missing values in "peak-rpm" column with the average value
+df["peak-rpm"].fillna(avg_peak_rpm, inplace=True)
+
+# Display the DataFrame with missing values filled using the average value for "peak-rpm" column
+print(df.head())
+df['peak-rpm'].replace(np.nan, avg_peak_rpm, inplace=True)
+df['num-of-doors'].value_counts().idxmax()
+#replace the missing 'num-of-doors' values by the most frequent 
+df["num-of-doors"].replace(np.nan, "four", inplace=True)
+# simply drop whole row with NaN in "price" column
+df.dropna(subset=["price"], axis=0, inplace=True)
+
+# reset index, because we droped two rows
+df.reset_index(drop=True, inplace=True)
+# Data Formatting , changing data types
+
+
+df[["bore", "stroke"]] = df[["bore", "stroke"]].astype("float")
+df[["normalized-losses"]] = df[["normalized-losses"]].astype("int")
+df[["price"]] = df[["price"]].astype("float")
+df[["peak-rpm"]] = df[["peak-rpm"]].astype("float")
+# Calculate "city-L/100km" using the conversion formula and replace "city-mpg" column with the result
+df["city-L/100km"] = 235 / df["city-mpg"]
+
+# Calculate "highway-L/100km" using the conversion formula and replace the data in the "highway-mpg" column
+df["highway-mpg"] = 235 / df["highway-mpg"]
+# Rename the "highway-mpg" column to "Highway-100km"
+df.rename(columns={"highway-mpg": "Highway-L100km"}, inplace=True)
+
+# Display the DataFrame with "highway-mpg" data converted to "Highway-100km" and column name updated
+print(df.head())
+# Data Normalization
+# replace (original value) by (original value)/(maximum value)
+df['length'] = df['length']/df['length'].max()
+df['width'] = df['width']/df['width'].max()
+df['height'] = df['height']/df['height'].max() 
+
+# show the scaled columns
+df[["length","width","height"]].head()
+# Convert the "horsepower" column to numeric (integer) data type
+df["horsepower"] = pd.to_numeric(df["horsepower"], errors="coerce")
+
+# Create the histogram with counts
+plt.hist(df["horsepower"], edgecolor="k", alpha=0.7)
+
+# Set x/y labels and plot title
+plt.xlabel("Horsepower")
+plt.ylabel("Count")
+plt.title("Horsepower Bins")
+
+# Show the plot
+plt.show()
+%matplotlib inline
+import matplotlib as plt
+from matplotlib import pyplot
+
+# draw historgram of attribute "horsepower" with bins = 3
+plt.pyplot.hist(df["horsepower"], bins = 3)
+
+# set x/y labels and plot title
+plt.pyplot.xlabel("horsepower")
+plt.pyplot.ylabel("count")
+plt.pyplot.title("horsepower bins")
+# Convert the "fuel-type" column to dummy variables
+dummy_variable_1 = pd.get_dummies(df["fuel-type"])
+
+# Rename the columns to provide more descriptive names
+dummy_variable_1.rename(columns={'gas': 'fuel-type-gas', 'diesel': 'fuel-type-diesel'}, inplace=True)
+
+# Display the first few rows of the dummy variables DataFrame with the updated column names
+print(dummy_variable_1.head())
+# merge data frame "df" and "dummy_variable_1" 
+df = pd.concat([df, dummy_variable_1], axis=1)
+
+# drop original column "fuel-type" from "df"
+df.drop("fuel-type", axis = 1, inplace=True)
+dummy_variable_2 = pd.get_dummies(df["aspiration"])
+dummy_variable_2.head()
+# merge data frame "df" and "dummy_variable_2" 
+df = pd.concat([df, dummy_variable_2], axis=1)
+
+# drop original column "aspiration" from "df"
+df.drop("aspiration", axis = 1, inplace=True)
+
+df.to_csv('clean_df.csv')
+df[['bore', 'stroke', 'compression-ratio', 'horsepower']].corr()
+#Let's find the scatterplot of "engine-size" and "price".
+
+# Engine size as potential predictor variable of price
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Create the scatter plot with regression line
+sns.regplot(x="engine-size", y="price", data=df)
+
+# Set the y-axis lower limit to 0
+plt.ylim(0)
+
+# Show the plot
+plt.show()
+# Now the correlation between engine size and price
+df[["engine-size", "price"]].corr()
+
+sns.regplot(x="Highway-L100km", y="price", data=df)
+
+df[["Highway-L100km", "price"]].corr()
+
+sns.regplot(x="peak-rpm", y="price", data=df)
+df[["peak-rpm", "price"]].corr()
+
+sns.regplot(x="peak-rpm", y="price", data=df)
+df[["peak-rpm", "price"]].corr()
+sns.regplot(x="stroke", y="price", data=df)
+df[['stroke','price']].corr()
+sns.boxplot(x="body-style", y="price", data=df)
+sns.boxplot(x="engine-location", y="price", data=df)
+# drive-wheels
+sns.boxplot(x="drive-wheels", y="price", data=df)
+df['drive-wheels'].value_counts().to_frame()
+# engine-location as variable
+engine_loc_counts = df['engine-location'].value_counts().to_frame()
+engine_loc_counts.rename(columns={'engine-location': 'value_counts'}, inplace=True)
+engine_loc_counts.index.name = 'engine-location'
+engine_loc_counts.head(10)
+# grouping results
+df_gptest = df[['drive-wheels','body-style','price']]
+grouped_test1 = df_gptest.groupby(['drive-wheels','body-style'],as_index=False).mean()
+grouped_test1
+# This grouped data is much easier to visualize when it is made into a pivot table.
+grouped_pivot = grouped_test1.pivot(index='drive-wheels',columns='body-style')
+grouped_pivot
+#fill missing values with 0
+grouped_pivot = grouped_pivot.fillna(0) 
+grouped_pivot
+# grouping results answer to question 4
+df_gptest2 = df[['body-style','price']]
+grouped_test_bodystyle = df_gptest2.groupby(['body-style'],as_index=False).mean()
+grouped_test_bodystyle
+#Let's use a heat map to visualize the relationship between Body Style vs Price.
+
+# use the grouped results
+plt.pcolor(grouped_pivot, cmap='RdBu')
+plt.colorbar()
+plt.show()
+fig, ax = plt.subplots()
+im = ax.pcolor(grouped_pivot, cmap='RdBu')
+
+#label names
+row_labels = grouped_pivot.columns.levels[1]
+col_labels = grouped_pivot.index
+
+#move ticks and labels to the center
+ax.set_xticks(np.arange(grouped_pivot.shape[1]) + 0.5, minor=False)
+ax.set_yticks(np.arange(grouped_pivot.shape[0]) + 0.5, minor=False)
+
+#insert labels
+ax.set_xticklabels(row_labels, minor=False)
+ax.set_yticklabels(col_labels, minor=False)
+
+#rotate label if too long
+plt.xticks(rotation=90)
+
+fig.colorbar(im)
+plt.show()
+#Correlation and Causation
+
+from scipy import stats
+#Let's calculate the Pearson Correlation Coefficient and P-value of 'wheel-base' and 'price'.
+
+pearson_coef, p_value = stats.pearsonr(df['wheel-base'], df['price'])
+print("The Pearson Correlation Coefficient is", pearson_coef, " with a P-value of P =", p_value)  
+
+pearson_coef, p_value = stats.pearsonr(df['horsepower'], df['price'])
+print("The Pearson Correlation Coefficient is", pearson_coef, " with a P-value of P = ", p_value)  
+
+pearson_coef, p_value = stats.pearsonr(df['length'], df['price'])
+print("The Pearson Correlation Coefficient is", pearson_coef, " with a P-value of P = ", p_value)  
+
+pearson_coef, p_value = stats.pearsonr(df['width'], df['price'])
+print("The Pearson Correlation Coefficient is", pearson_coef, " with a P-value of P =", p_value ) 
+pearson_coef, p_value = stats.pearsonr(df['curb-weight'], df['price'])
+print("The Pearson Correlation Coefficient is", pearson_coef, " with a P-value of P = ", p_value)  
+pearson_coef, p_value = stats.pearsonr(df['engine-size'], df['price'])
+print("The Pearson Correlation Coefficient is", pearson_coef, " with a P-value of P =", p_value) 
+pearson_coef, p_value = stats.pearsonr(df['bore'], df['price'])
+print("The Pearson Correlation Coefficient is", pearson_coef, " with a P-value of P =  ", p_value ) 
+pearson_coef, p_value = stats.pearsonr(df['city-mpg'], df['price'])
+print("The Pearson Correlation Coefficient is", pearson_coef, " with a P-value of P = ", p_value)  
+# To see if different types of 'drive-wheels' impact 'price', we group the data.
+
+grouped_test2=df_gptest[['drive-wheels', 'price']].groupby(['drive-wheels'])
+grouped_test2.head(2)
+df_gptest
+grouped_test2.get_group('4wd')['price']
+# ANOVA
+f_val, p_val = stats.f_oneway(grouped_test2.get_group('fwd')['price'], grouped_test2.get_group('rwd')['price'], grouped_test2.get_group('4wd')['price'])  
+ 
+print( "ANOVA results: F=", f_val, ", P =", p_val)   
+# Let's examine them separately.
+
+# fwd and rwd
+f_val, p_val = stats.f_oneway(grouped_test2.get_group('fwd')['price'], grouped_test2.get_group('rwd')['price'])  
+ 
+print( "ANOVA results: F=", f_val, ", P =", p_val )
+# Let's examine the other groups.
+
+# 4wd and rwd
+f_val, p_val = stats.f_oneway(grouped_test2.get_group('4wd')['price'], grouped_test2.get_group('rwd')['price'])  
+   
+print( "ANOVA results: F=", f_val, ", P =", p_val)   
+# 4wd and fwd
+f_val, p_val = stats.f_oneway(grouped_test2.get_group('4wd')['price'], grouped_test2.get_group('fwd')['price'])  
+ 
+print("ANOVA results: F=", f_val, ", P =", p_val)   
+
+print("Lab 3 Finished and Lab 4 Starts here")
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import skillsnetwork
+import warnings
+warnings.filterwarnings('ignore')
+from sklearn.linear_model import LinearRegression
+lm = LinearRegression()
+lm
+X = df[['Highway-L100km']]
+Y = df['price']
+lm.fit(X,Y)
+# We can output a prediction:
+Yhat=lm.predict(X)
+Yhat[0:5]   
+lm.intercept_
+lm.coef_
+# Q 1 a) create a linear regression lm1
+lm1 = LinearRegression()
+lm1
+# Question 1 b): Train the model using "engine-size" as the independent variable and "price" as the dependent variable?
+X = df[['engine-size']]
+Y = df['price']
+lm1.fit(X,Y)
+ #1 c): Find the slope and intercept of the model.
+lm1.intercept_
+lm1.coef_
+#1 d): What is the equation of the predicted line? You can use x and yhat or "engine-size" or "price".
+
+# using X and Y  
+Yhat=-7963.34 + 166.86*X
+
+Price=-7963.34 + 166.86*df['engine-size']
+# Multiple Regression
+
+Z = df[['horsepower', 'curb-weight', 'engine-size', 'Highway-L100km']]
+lm.intercept_
+lm.coef_
+# Q2 a): Create and train a Multiple Linear Regression model "lm2" where the response variable is "price", and the predictor variable is "normalized-losses" and "highway-mpg".
+lm2 = LinearRegression()
+X = df[['normalized-losses','Highway-L100km' ]]
+Y = df['price']
+lm2.fit(X,Y)
+# Q 2 b): Find the coefficient of the model
+lm2.coef_
+lm2.intercept_
+print("to be continued")
